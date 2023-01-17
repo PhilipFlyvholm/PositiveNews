@@ -1,0 +1,128 @@
+<% showAll = false %>
+<%= javascript_include_tag "articles", "data-turbolinks-track" => true %>
+<% sources = @articles.group(:source).select("source as name, count(*) as total_count, count(case when score >= 1 then 1 end) as score_greater_than_one") %>
+
+<h1>Articles</h1>
+<style>
+    .sq-round {
+        width: 2em;
+        height: 2em;
+        border-radius: 2em;
+        text-align: center;
+        line-height: 2em;
+        font-weight: bold;
+        background-position: center;
+        background-size: cover;
+    }
+
+    .bg-image-none {
+        display: none;
+    }
+
+    .bg-image-DR {
+        background-image: url("https://www.dr.dk/favicon.ico");
+    }
+
+    .bg-image-EB {
+        background-color: #b12023;
+        background-image: url("https://ekstrabladet.dk/favicon.ico");
+    }
+
+    .bg-image-BT {
+        background-image: url("https://bt.dk/favicon.ico");
+    }
+
+    .bg-image-Altinget {
+        background-image: url("https://www.altinget.dk/favicon.ico");
+    }
+
+    .bg-image-TV-2 {
+        background-image: url("https://web.tv2a.dk/static/images/favicon.png");
+    }
+
+    .bg-image-Politiken {
+        background-image: url("https://politiken.dk/static/assets/favicon/politiken/android-icon-192x192.png");
+    }
+
+    .bg-image-Jyllands-Posten {
+        background-image: url("https://jyllands-posten.dk/favicon.ico");
+    }
+
+    .bg-image-Berlingske {
+        background-image: url("https://berlingske.dk/favicon-96x96.png");
+    }
+    .article{
+        filter: grayscale(.3);
+        transition: .5s filter;
+    }
+    .article.current{
+        filter: grayscale(0);
+    }
+    input.source-input + label.source-label{
+        filter: grayscale(1);
+        transition: .5s filter;
+    }
+    input.source-input:checked + label.source-label{
+        filter: grayscale(0);
+    }
+    <%=sources.each do |source| %>
+        #article-list.hide-source-<%=source.name%> .article[data-article-source="<%=source.name%>"]{
+            display: none;
+        }
+    <% end %>
+
+</style>
+<div class="flex flex-col md:flex-row gap-x-3">
+  <aside>
+    <div class="grid grid-cols-3 md:grid-cols-1 lg:grid-cols-2 gap-3 w-full">
+      <% sources.each do |source| %>
+        <input checked type="checkbox" class="hidden source-input" id="source-<%=source.name %>"/>
+        <label class="block flex-1 bg-slate-800 p-2 rounded hover:bg-slate-700 hover:cursor-pointer source-label active:shadow-slate-800 active:shadow-inner" for="source-<%=source.name %>">
+          <div class="sq-round m-auto <%= "bg-image-" + source.name.sub(" ", "-") %>" style=""></div>
+          <small class="m-0 text-center m-auto block font-bold"><%= (source.score_greater_than_one * 100 / source.total_count) %>
+            %</small>
+          <div class="flex items-center p-1">
+            <i class="fa-solid fa-face-sad-tear text-red-500"></i>
+            <div class="flex-1 h-2 rounded bg-red-500 m-1 relative overflow-hidden min-w-[3em]">
+              <div style="width:<%=(source.score_greater_than_one*100/source.total_count) %>%;" class="h-full bg-green-500 absolute right-0"></div>
+            </div>
+            <i class="fa-solid fa-face-smile text-green-500"></i>
+          </div>
+        </label>
+      <% end %>
+    </div>
+  </aside>
+  <ul class="flex-1 flex gap-5 flex-col mt-5 md:m-0" id="article-list">
+
+    <% @articles.where('score >= 1').order(published: :desc).each_with_index do |article, i| %>
+      <article class="article pt-5 bg-slate-800" data-article-source="<%=article.source %>" data-article-nr="<%= i %>">
+        <div class="flex px-5">
+          <div class="sq-round <%= "bg-image-" + (article.source || "none").sub(" ", "-") %>" style=""></div>
+          <div class="flex-1 px-2">
+            <h4 class="m-0"><%= link_to article.title, article.link %></h4>
+            <% if article.author? %>
+              <small>Af <%= article.author %></small>
+            <% end %>
+            <p class="m-0 text-justify"><%= article.body[0, 250]... %></p>
+            <% if article.image_url %>
+              <img class="rounded-md w-full mx-auto my-2" src="<%= article.image_url %>"/>
+            <% end %>
+          </div>
+
+        </div>
+        <div class="flex bg-slate-700 px-5 py-1">
+          <div class="flex-1 text-sm">
+            <%= article.source %>:
+            <%= icon("fa-solid", "clock") %> <%= article.published %>
+            <%= icon("fa-solid", "star") %> <%= article.score.round(2) %>
+          </div>
+          <div class="text-sm">
+            <%= link_to (icon("fa-solid", "lock")), article %>
+          </div>
+        </div>
+
+      </article>
+    <% end %>
+  </ul>
+</div>
+<%= link_to "New Article", new_article_path %>
