@@ -3,6 +3,8 @@ class ArticlesController < ApplicationController
 
   def index
     @articles = Article.all
+    @sources = @articles.group(:source).select("source as name, count(*) as total_count, count(case when score >= 1 then 1 end) as score_greater_than_one")
+
   end
   def show
     @article = Article.find(params[:id])

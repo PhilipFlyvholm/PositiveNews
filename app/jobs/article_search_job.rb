@@ -100,6 +100,7 @@ class ArticleSearchJob < ApplicationJob
         @article.source = source
         @article.author = author
         @article.image_url = img
+        @article.validated = false
         @article.save
       end
     end

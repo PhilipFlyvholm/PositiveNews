@@ -1,6 +1,4 @@
-<% showAll = false %>
 <%= javascript_include_tag "articles", "data-turbolinks-track" => true %>
-<% sources = @articles.group(:source).select("source as name, count(*) as total_count, count(case when score >= 1 then 1 end) as score_greater_than_one") %>
 
 <h1>Articles</h1>
 <style>
@@ -65,7 +63,7 @@
     input.source-input:checked + label.source-label{
         filter: grayscale(0);
     }
-    <%=sources.each do |source| %>
+    <%=@sources.each do |source| %>
         #article-list.hide-source-<%=source.name.sub(" ", "-")%> .article[data-article-source="<%=source.name%>"]{
             display: none;
         }
@@ -75,7 +73,7 @@
 <div class="flex flex-col md:flex-row gap-x-3 lg:mx-auto justify-center">
   <aside>
     <div class="grid grid-cols-3 md:grid-cols-1 lg:grid-cols-2 gap-3 w-full">
-      <% sources.each do |source| %>
+      <% @sources.each do |source| %>
         <input checked type="checkbox" class="hidden source-input" id="source-<%=source.name %>"/>
         <label class="block flex-1 bg-slate-800 p-2 rounded hover:bg-slate-700 hover:cursor-pointer source-label active:shadow-slate-800 active:shadow-inner" for="source-<%=source.name %>">
           <div class="sq-round m-auto <%= "bg-image-" + source.name.sub(" ", "-") %>" style=""></div>
