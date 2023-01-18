@@ -36,9 +36,10 @@ window.addEventListener('load', () => {
     const sourceInputs = document.querySelectorAll('input.source-input');
     const articleList = document.getElementById("article-list");
     sourceInputs.forEach((el) => {
+        const id = el.id.replaceAll(' ', '-')
         el.addEventListener('click', (_) =>{
-            if(el.checked) articleList.classList.remove('hide-' + el.id);
-            else articleList.classList.add('hide-' + el.id);
+            if(el.checked) articleList.classList.remove('hide-' + id);
+            else articleList.classList.add('hide-' + id);
 
         })
     })

@@ -66,13 +66,13 @@
         filter: grayscale(0);
     }
     <%=sources.each do |source| %>
-        #article-list.hide-source-<%=source.name%> .article[data-article-source="<%=source.name%>"]{
+        #article-list.hide-source-<%=source.name.sub(" ", "-")%> .article[data-article-source="<%=source.name%>"]{
             display: none;
         }
     <% end %>
 
 </style>
-<div class="flex flex-col md:flex-row gap-x-3">
+<div class="flex flex-col md:flex-row gap-x-3 lg:mx-auto justify-center">
   <aside>
     <div class="grid grid-cols-3 md:grid-cols-1 lg:grid-cols-2 gap-3 w-full">
       <% sources.each do |source| %>
@@ -92,7 +92,7 @@
       <% end %>
     </div>
   </aside>
-  <ul class="flex-1 flex gap-5 flex-col mt-5 md:m-0" id="article-list">
+  <ul class="flex-1 flex gap-5 flex-col mt-5 md:m-0 lg:max-w-[100vh]" id="article-list">
 
     <% @articles.where('score >= 1').order(published: :desc).each_with_index do |article, i| %>
       <article class="article pt-5 bg-slate-800" data-article-source="<%=article.source %>" data-article-nr="<%= i %>">
