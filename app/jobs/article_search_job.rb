@@ -28,7 +28,7 @@ class ArticleSearchJob < ApplicationJob
       ArticleSearchJob.set(wait: 5.minutes).perform_later
     end
   end
-
+  # FOR FUTURE https://github.com/jekyll/classifier-reborn
   def fetch_wallnot
     url = "https://wallnot.dk/rss"
     URI.open(url) do |rss|
@@ -37,6 +37,7 @@ class ArticleSearchJob < ApplicationJob
         guid = item.guid.to_s.match(@@guid_regex)[1]
 
         if Article.exists?(guid: guid) then
+          puts "Article already exists"
           next
         end
         published_time = Time.parse(item.pubDate.to_s)
@@ -44,6 +45,7 @@ class ArticleSearchJob < ApplicationJob
         source = item.description[12, item.description.length]
         scrape = scrape_content(item.link, source)
         if scrape == nil then
+          puts "Failed to scrape content"
           next
         end
         content, author, img = *scrape
@@ -85,7 +87,6 @@ class ArticleSearchJob < ApplicationJob
             else
               score = 0
               puts "Unknown response from AI:" + result
-              next
             end
           end
         end
